@@ -5,9 +5,10 @@ use axum::{
 };
 use tower_http::services::ServeDir;
 use tower_http::cors::{Any, CorsLayer};
-mod journal;
+mod api;
 mod config;
 mod routes;
+mod journal;
 
 pub async fn start() {
     // cors so tauri can fetch without trouble
@@ -18,8 +19,9 @@ pub async fn start() {
                             .allow_headers(Any);
 
     // build our application with a single route
-    let app = Router::new().route("/", get(|| async { "Hello, World!" }))
-                         .route("/home", get(journal::home::home()))
+    let app = Router::new().route("/", get(|| async { "there is nothing here." }))
+                         .route("/api/create", get(api::create::create()))
+                         .route("/api/home", get(api::home::home()))
                          .nest_service("/src", ServeDir::new("/home/aswin/projects/thought-garden/src"))
                          .nest_service("/assets", ServeDir::new("/home/aswin/projects/thought-garden/src/assets"))
                          .nest_service("/intro", ServeDir::new("/home/aswin/projects/thought-garden/src/intro"))
