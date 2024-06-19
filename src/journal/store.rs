@@ -55,6 +55,7 @@ impl StoreDatabase {
             Err(e) => eprintln!("[SQLITError](store-remove) {e}"),
         }        
     }
+    
 
 
 }
