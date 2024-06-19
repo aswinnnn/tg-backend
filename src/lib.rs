@@ -9,6 +9,8 @@ mod api;
 mod config;
 mod routes;
 mod journal;
+mod analysis;
+mod db;
 
 pub async fn start() {
     // cors so tauri can fetch without trouble

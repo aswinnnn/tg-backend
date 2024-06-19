@@ -27,7 +27,6 @@ impl Metadata {
 }
 
 struct Analysis {
-/// ANALYSIS DESERVES ITS OWN DIRECTORY. ITS GONNA BE AWESOME.
 }
 
 
