@@ -1,19 +1,18 @@
 use std::process::exit;
 
 use rusqlite::{params, Connection, Result};
-use time::PrimitiveDateTime;
+use time::{Instant, OffsetDateTime, PrimitiveDateTime};
 use crate::config::utils::db_path;
 
 pub fn getconn() -> Connection {
     if let Ok(conn) = Connection::open(db_path().expect("error fetching db path")) {
+        let t = OffsetDateTime::now_utc().to_string();
         // todo
-        // figure out how to get the time NOW and log it here
-        // StoreFolder impls
         // use both Store* in Journal to make Journal impls
         // figure out uuids
         // SQLCipher pls
         // encrypting the journals
-        println!("[CONNECTION-OPEN]");
+        println!("[{t}][GETCONN] opened SQLite connection.");
         conn
     }
     else { 
@@ -31,14 +30,14 @@ pub fn create_tables() {
     let conn = getconn();
     match conn.execute(r#"
     CREATE TABLE IF NOT EXISTS metadata (
-        uuid NOT NULL PRIMARY KEY,
+        uuid BLOB NOT NULL PRIMARY KEY,
         created DATETIME NOT NULL,
         edited DATETIME NOT NULL,
         words INTEGER
     );
 
     CREATE TABLE IF NOT EXISTS media (
-        uuid NOT NULL FOREIGN KEY,
+        uuid BLOB NOT NULL FOREIGN KEY,
         wallpaper TEXT,
         font TEXT,
         emoji TEXT,
@@ -46,7 +45,7 @@ pub fn create_tables() {
     );
     CREATE TABLE IF NOT EXISTS store (
         path TEXT,
-        uuid FOREIGN KEY,
+        uuid BLOB NOT NULL FOREIGN KEY,
         os_modified DATETIME
     );
     "#, []) {

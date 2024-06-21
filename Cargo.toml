@@ -10,7 +10,7 @@ anyhow = "1.0.86"
 axum = "0.7.5"
 dirs = "5.0.1"
 rusqlite = { version = "0.31.0", features = ["time", "uuid"] }
-time = { version = "0.3.36", features = ["macros", "formatting"] }
+time = { version = "0.3.36", features = ["std", "macros", "formatting"] }
 tokio = { version = "1.37.0", features = ["full"] }
 tower-http = { version = "0.5.2", features = ["fs", "cors"] }
 uuid = "1.8.0"
