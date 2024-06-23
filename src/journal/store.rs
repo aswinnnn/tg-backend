@@ -7,7 +7,6 @@ use std::{fs::{self, File}, path::PathBuf};
 use anyhow::{Result, Ok,Error};
 use crate::{config::utils::data_path, db::getconn};
 
-/// a better rep of the tg directory, where journals are stored.
 /// gives you access to the journal database and directory
 pub struct Store {
     pub path: PathBuf,
@@ -18,7 +17,13 @@ pub struct Store {
 
 impl Store {
     pub fn new() -> Result<Store> {
-        Ok(Store { path: store_path()?, index: store_index()?, db: StoreDatabase::new(), dir: StoreFolder::new()  })
+        Ok(
+            Store { path: store_path()?,
+                index: store_index()?, 
+                db: StoreDatabase::new(), 
+                dir: StoreFolder::new()  
+            }
+        )
     }
 
     pub fn uuid() -> Uuid {
@@ -39,23 +44,24 @@ fn store_index() -> Result<Vec<String>> {
     Ok(ve)
 }
 
-struct StoreDatabase {
+pub struct StoreDatabase {
     // this is just to make accessing the store db easy, no fields needed for now
 }
 
 impl StoreDatabase {
     pub fn new() -> StoreDatabase {StoreDatabase{}}
 
-    pub fn add(self, path: String, id: Vec<u8>, datetime: OffsetDateTime) {
+    pub fn add(self, path: String, id: Vec<u8>,title: String, datetime: OffsetDateTime) {
         let con = getconn();
 
-        match con.execute("INSERT INTO store VALUES(?,?,?);", params![path,id,datetime]) {
+        match con
+        .execute("INSERT INTO store VALUES(?,?,?,?);", params![id,path,title,datetime]) {
             core::result::Result::Ok(n) => println!("[SQLITE](store-add) {n} rows affected"),
             Err(e) => eprintln!("[SQLITError](store-add) {e}"),
         }        
     }
 
-    pub fn remove(self, id: String) {
+    pub fn remove(self, id: Vec<u8>) {
         let con = getconn();
 
         match con.execute("DELETE FROM store WHERE uuid=?;", params![id]) {
@@ -64,32 +70,35 @@ impl StoreDatabase {
         }        
     }
 
+    pub fn update_title(&self, title: String, id: Vec<u8>) {
+
+        let con = getconn();
+
+        match con.execute("UPDATE store SET title = ? WHERE uuid = ?;", params![title,id]) {
+            core::result::Result::Ok(n) => println!("[SQLITE][store-remove] {n} rows affected"),
+            Err(e) => eprintln!("[SQLITError](store-remove) {e}"),
+        }        
+    }
+
+
 }
 
-pub struct StoreFolder {
-    // access system journal directory using methods.
-    // fields are statistics [no. of journals] related to the current session.
-    pub deleted: u64,
-    pub created: u64,
-    pub written_words: u64
-}
+pub struct StoreFolder {}
 
 impl StoreFolder {
     pub fn new() -> StoreFolder {
-        StoreFolder { deleted: 0, created: 0, written_words: 0 }
+        StoreFolder { }
     }
 
     /// creates a file in the tg [journal] folder
     pub fn create(&mut self, id: &str) -> Result<()> {
         let f = File::create(store_path()?.join(id))?;
-        self.created += 1;
         Ok(())
     }
 
     /// deletes a file in the tg [journal] folder
     pub fn delete(&mut self,id: &str) -> Result<()> {
         fs::remove_file(store_path()?.join(id))?;
-        self.deleted += 1;
         Ok(())
     }
 
@@ -98,7 +107,6 @@ impl StoreFolder {
 
         fs::write(store_path()?.join(id), content.clone())?;
         let len: usize = content.chars().count();
-        self.written_words += len as u64;
         Ok(())
     }
 }

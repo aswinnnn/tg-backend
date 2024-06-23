@@ -14,7 +14,7 @@ mod db;
 
 pub async fn start() {
     // cors so tauri can fetch without trouble
-    let origins = ["tauri://localhost".parse::<HeaderValue>().unwrap(), "http://localhost:1420".parse::<HeaderValue>().unwrap()];
+    let origins =  ["tauri://localhost".parse::<HeaderValue>().unwrap(), "http://localhost:1420".parse::<HeaderValue>().unwrap()];
     let cors = CorsLayer::new()
                             .allow_origin(origins)
                             .allow_methods(Any)

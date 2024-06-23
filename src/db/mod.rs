@@ -8,8 +8,6 @@ pub fn getconn() -> Connection {
     if let Ok(conn) = Connection::open(db_path().expect("error fetching db path")) {
         let t = OffsetDateTime::now_utc().to_string();
         // todo
-        // use both Store* in Journal to make Journal impls
-        // figure out uuids
         // SQLCipher pls
         // encrypting the journals
         println!("[{t}][GETCONN] opened SQLite connection.");
@@ -30,22 +28,25 @@ pub fn create_tables() {
     let conn = getconn();
     match conn.execute(r#"
     CREATE TABLE IF NOT EXISTS metadata (
-        uuid BLOB NOT NULL PRIMARY KEY,
+        uuid BLOB PRIMARY KEY NOT NULL,
         created DATETIME NOT NULL,
         edited DATETIME NOT NULL,
-        words INTEGER
+        words INTEGER,
+        FOREIGN KEY (uuid) REFERENCES store(uuid) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS media (
-        uuid BLOB NOT NULL FOREIGN KEY,
+        uuid BLOB NOT NULL PRIMARY KEY,
         wallpaper TEXT,
         font TEXT,
         emoji TEXT,
-        song TEXT
+        song TEXT,
+        FOREIGN KEY (uuid) REFERENCES store(uuid) ON DELETE CASCADE
     );
     CREATE TABLE IF NOT EXISTS store (
+        uuid BLOB PRIMARY KEY NOT NULL,
         path TEXT,
-        uuid BLOB NOT NULL FOREIGN KEY,
+        title TEXT,
         os_modified DATETIME
     );
     "#, []) {
