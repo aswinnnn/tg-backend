@@ -5,7 +5,7 @@ use time::{OffsetDateTime, PrimitiveDateTime};
 use uuid::Uuid;
 use std::{fs::{self, File}, path::PathBuf};
 use anyhow::{Result, Ok,Error};
-use crate::{config::utils::data_path, db::getconn};
+use crate::{analysis, config::utils::data_path, db::getconn, journal::{Journal, Metadata}};
 
 /// gives you access to the journal database and directory
 pub struct Store {
@@ -24,6 +24,40 @@ impl Store {
                 dir: StoreFolder::new()  
             }
         )
+    }
+
+    pub fn get_journal(id: Vec<u8>) -> Result<Journal> {
+        let con = getconn();
+        let id_str = Uuid::from_slice(&id).expect("error making uuid").to_string();
+
+        // journal struct
+        let mut title = String::new();
+        let mut path = String::new();
+        let mut content = String::new(); // gotten by reading I/O desu
+
+        // metadata struct
+        let mut created = String::new();
+        let mut edited = String::new();
+        let mut words = 0;
+
+        let _ = con.query_row("SELECT path, title FROM store WHERE uuid = ?", params![id], |row| {
+            path = row.get(0).expect("[sqlite] failed to get path");
+            title = row.get(1).expect("[sqlite] failed to get title");
+            core::result::Result::Ok(())
+        });
+
+        let _ = con.query_row("SELECT created_at,edited_at,words FROM metadata WHERE uuid = ?", params![id], |row| {
+            created = row.get(0).expect("[sqlite] failed to get created_at");
+            edited = row.get(1).expect("[sqlite] failed to get edited");
+            words = row.get(2).expect("[sqlite] failed to get words");
+            core::result::Result::Ok(())
+        });
+
+        let meta = Metadata { created_at: created, 
+            words: words,
+            edited_at: edited };
+        
+        Ok(Journal { uuid: id, uuid_str: id_str,buffer_title: title, path: path.into(), buffer: todo!(), metadata: meta, analysis: super::Analysis {  }}) 
     }
 
     pub fn uuid() -> Uuid {

@@ -4,7 +4,7 @@ use anyhow::{Ok, Result};
 
 pub fn data_path() -> Result<PathBuf> {
     if let Some(path) = dirs::data_dir() {
-        let path = path.join("thought-garden");
+        let path = path.join("thought-garden-app");
         Ok(path)
     }
     else {

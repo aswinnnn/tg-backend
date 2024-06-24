@@ -3,11 +3,11 @@ use dirs;
 use anyhow::{Ok, Result};
 pub mod utils;
 
-struct Configuration {
-    configs: HashMap<String, Config>
+pub struct Configuration {
+    pub configs: HashMap<String, Config>
 }
 
-enum Config {
+pub enum Config {
     // n
     Number(i64),
     Optioned(Vec<Config>),

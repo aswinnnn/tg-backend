@@ -12,22 +12,28 @@ use crate::db::getconn;
 
 
 #[derive(Debug)]
-struct Journal {
-    uuid: Vec<u8>,
+pub struct Journal {
+    pub uuid: Vec<u8>,
+    pub uuid_str: String,
     buffer_title: String,
-    path: PathBuf,
+    pub path: PathBuf,
     buffer: String, /// buffer because its always changing
-    metadata: Metadata,
-    analysis: Analysis
+    pub metadata: Metadata,
+    pub analysis: Analysis
 }
 
 /// this is sqlite territory. we have some precious metadata
 /// journal titles are in the store db for faster gets.
 /// all volatile "fields" are functions so we can get it realtime.
+/// do not depend on the struct fields for rt data lol they're just
+/// here to pass data unitarily.
 #[derive(Debug)]
 pub struct Metadata {
-    pub created_at: String
+    pub created_at: String,
+    pub words: u64,
+    pub edited_at: String
 }
+
 pub enum MetadataField {
     edited(OffsetDateTime),
     words(u64)
@@ -88,8 +94,14 @@ impl Analysis {
 
 
 impl Journal {
-    // creates a new journal with the given buffer title
 
+    // initalize an existing journal.
+    // bad things might happen if u init two same journal at the same time.
+    pub fn init(id: Vec<u8>) -> Result<Journal> {
+        store::Store::get_journal(id)
+    }
+
+    // creates a new journal with the given buffer title
     pub fn new(buffer_title: String) -> Result<Journal> {
 
         // Journal struct
@@ -101,7 +113,12 @@ impl Journal {
         let path = store::store_path()?.join(id_str.as_str());
 
         // Metadata struct
-        let meta = Metadata { created_at: created.to_string() };
+        let meta = Metadata { 
+            created_at: created.to_string(), 
+            words: 0, 
+            edited_at: created.to_string()};
+
+
         meta.create(id.as_bytes().to_vec(), 0);
 
         st.dir.create(id_str.as_str())?;
@@ -109,6 +126,7 @@ impl Journal {
         
         let journal = Journal { 
             uuid: id.as_bytes().to_vec(),
+            uuid_str: id.to_string(),
             buffer_title: buffer_title, 
             path: path,
             buffer: String::new(),
@@ -134,7 +152,7 @@ impl Journal {
         self.buffer_title = title
     }
 
-    fn write_to_disk(&mut self) -> Result<()> {
+    pub fn write_to_disk(&mut self) -> Result<()> {
         let t = std::time::Instant::now();
         let st = Store::new()?;
         let _ = fs::write(self.path.clone(), self.buffer.clone()).map_err(|e| {

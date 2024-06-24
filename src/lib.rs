@@ -6,11 +6,11 @@ use axum::{
 use tower_http::services::ServeDir;
 use tower_http::cors::{Any, CorsLayer};
 mod api;
-mod config;
+pub mod config;
 mod routes;
-mod journal;
+pub mod journal;
 mod analysis;
-mod db;
+pub mod db;
 
 pub async fn start() {
     // cors so tauri can fetch without trouble
