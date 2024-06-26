@@ -27,14 +27,18 @@ pub fn getconn() -> Connection {
 pub fn create_tables() {
     let conn = getconn();
     match conn.execute(r#"
-    CREATE TABLE IF NOT EXISTS metadata (
+    CREATE TABLE IF NOT EXISTS store (
         uuid BLOB PRIMARY KEY NOT NULL,
-        created DATETIME NOT NULL,
-        edited DATETIME NOT NULL,
-        words INTEGER,
-        FOREIGN KEY (uuid) REFERENCES store(uuid) ON DELETE CASCADE
+        path TEXT,
+        title TEXT,
+        os_modified DATETIME
     );
+    "#, []) {
+        Ok(n) => println!("[SQLITE] Table created.{n} number of rows affected"),
+        Err(e) => eprintln!("[SQLITError] {e}")
+    }
 
+    match conn.execute(r#"
     CREATE TABLE IF NOT EXISTS media (
         uuid BLOB NOT NULL PRIMARY KEY,
         wallpaper TEXT,
@@ -43,14 +47,25 @@ pub fn create_tables() {
         song TEXT,
         FOREIGN KEY (uuid) REFERENCES store(uuid) ON DELETE CASCADE
     );
-    CREATE TABLE IF NOT EXISTS store (
+    "#, []) {
+        Ok(n) => println!("[SQLITE] Table created.{n} number of rows affected"),
+        Err(e) => eprintln!("[SQLITError] {e}")
+    }
+
+    match conn.execute(r#"
+    CREATE TABLE IF NOT EXISTS metadata (
         uuid BLOB PRIMARY KEY NOT NULL,
-        path TEXT,
-        title TEXT,
-        os_modified DATETIME
+        created DATETIME NOT NULL,
+        edited DATETIME NOT NULL,
+        words INTEGER,
+        FOREIGN KEY (uuid) REFERENCES store(uuid) ON DELETE CASCADE
     );
     "#, []) {
-        Ok(n) => println!("[SQLITE] Tables created.{n} number of rows affected"),
+        Ok(n) => println!("[SQLITE] Table created.{n} number of rows affected"),
         Err(e) => eprintln!("[SQLITError] {e}")
     }
 }
+
+    
+
+    

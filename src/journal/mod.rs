@@ -41,9 +41,13 @@ pub enum MetadataField {
 impl Metadata {
     // access
     pub fn create(&self, id: Vec<u8>, words: u64) {
+        // todo
+        // textContent doesnt respect breaklines
+        // do getters for UI shit is InTERESTING ahh
+        // make the logs better, both js and rst
         let con = getconn();
         // created_at is used for edited_at since its newly created
-        match con.execute("INSERT INTO metadata VALUES(?,?,?);", params![id,self.created_at,words]) {
+        match con.execute("INSERT INTO metadata VALUES(?,?,?,?);", params![id,self.created_at,self.created_at,words]) {
             core::result::Result::Ok(o) => println!("[METADATA-CREATE] Affected {} rows", o),
             Err(e) => eprintln!("[METADATA-CREATE] {}",e),
         }
@@ -119,11 +123,12 @@ impl Journal {
             edited_at: created.to_string()};
 
 
-        meta.create(id.as_bytes().to_vec(), 0);
 
-        st.dir.create(id_str.as_str())?;
+        st.dir.create(id_str.as_str())?; 
+        // store should always be the first to receive stuff
         st.db.add(path.to_string_lossy().to_string(), id.as_bytes().to_vec(), buffer_title.clone(), created);
-        
+        // then metadata
+        meta.create(id.as_bytes().to_vec(), 0);
         let journal = Journal { 
             uuid: id.as_bytes().to_vec(),
             uuid_str: id.to_string(),

@@ -33,7 +33,7 @@ impl Store {
         // journal struct
         let mut title = String::new();
         let mut path = String::new();
-        let mut content = String::new(); // gotten by reading I/O desu
+        let mut content = fs::read_to_string(store_path()?.join(Uuid::from_slice(&id).unwrap().to_string())).unwrap();
 
         // metadata struct
         let mut created = String::new();
@@ -57,7 +57,7 @@ impl Store {
             words: words,
             edited_at: edited };
         
-        Ok(Journal { uuid: id, uuid_str: id_str,buffer_title: title, path: path.into(), buffer: todo!(), metadata: meta, analysis: super::Analysis {  }}) 
+        Ok(Journal { uuid: id, uuid_str: id_str,buffer_title: title, path: path.into(), buffer: content, metadata: meta, analysis: super::Analysis {  }}) 
     }
 
     pub fn uuid() -> Uuid {
@@ -66,6 +66,7 @@ impl Store {
 }
 
 
+// journal files are stored here.
 pub fn store_path() -> Result<PathBuf> {
     Ok(data_path()?.join("tg"))
 }
