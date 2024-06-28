@@ -3,10 +3,11 @@ use std::process::exit;
 use rusqlite::{params, Connection, Result};
 use time::{Instant, OffsetDateTime, PrimitiveDateTime};
 use crate::config::utils::db_path;
+use chrono;
 
 pub fn getconn() -> Connection {
     if let Ok(conn) = Connection::open(db_path().expect("error fetching db path")) {
-        let t = OffsetDateTime::now_utc().to_string();
+        let t = chrono::Local::now().format("%-H:%-M:%-S %p").to_string();
         // todo
         // SQLCipher pls
         // encrypting the journals

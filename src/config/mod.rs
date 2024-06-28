@@ -19,9 +19,18 @@ pub enum Config {
 
 impl Configuration {
     pub fn new() -> Result<()> {
-        utils::create_config_dir();
-        utils::populate_config_dir();
+        match utils::create_config_dir() {
+            Err(e) => {eprintln!("[create-config] {e}")},
+            _ => {}
+        };
+
+        match utils::populate_config_dir() {
+            Err(e) => {eprintln!("[populate-config] {e}")},
+            _ => {}
+        };
+
         create_tables();
+
         Ok(())
     }
 

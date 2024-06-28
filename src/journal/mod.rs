@@ -15,9 +15,9 @@ use crate::db::getconn;
 pub struct Journal {
     pub uuid: Vec<u8>,
     pub uuid_str: String,
-    buffer_title: String,
+    pub buffer_title: String,
     pub path: PathBuf,
-    buffer: String, /// buffer because its always changing
+    pub buffer: String, /// buffer because its always changing
     pub metadata: Metadata,
     pub analysis: Analysis
 }
@@ -42,7 +42,6 @@ impl Metadata {
     // access
     pub fn create(&self, id: Vec<u8>, words: u64) {
         // todo
-        // textContent doesnt respect breaklines
         // do getters for UI shit is InTERESTING ahh
         // make the logs better, both js and rst
         let con = getconn();
@@ -168,4 +167,56 @@ impl Journal {
         Ok(())
     }
 
+}
+
+pub struct Media {}
+pub enum MediaType {
+    Wallpaper(String),
+    Emoji(String),
+    Font(String),
+    Song(String)
+}
+
+impl Media {
+    /// give a empty mediatype and get that media, from an id
+    /// ```
+    /// let wp = match Media::get(id.as_bytes().to_vec(), MediaType::Wallpaper(String::new())) {
+    /// MediaType::Wallpaper(w) => {w},
+    /// _ => {String::new()}
+    /// };
+    /// ```
+    pub fn get(id: Vec<u8> ,t: MediaType) -> MediaType {
+        let con = getconn();
+
+        match t {
+            MediaType::Wallpaper(_) => {
+                let r = con.query_row("SELECT wallpaper FROM media WHERE uuid = ?", 
+                params![id], |row| {
+                row.get::<usize, String>(0)
+                }).unwrap();
+                MediaType::Wallpaper(r)                
+            },
+            MediaType::Emoji(_) => {
+                let r = con.query_row("SELECT emoji FROM media WHERE uuid = ?", 
+                params![id], |row| {
+                row.get::<usize, String>(0)
+                }).unwrap();
+                MediaType::Emoji(r)                
+            },
+            MediaType::Font(_) => {
+                let r = con.query_row("SELECT font FROM media WHERE uuid = ?", 
+                params![id], |row| {
+                row.get::<usize, String>(0)
+                }).unwrap();
+                MediaType::Font(r)                
+            },
+            MediaType::Song(_) => {
+                let r = con.query_row("SELECT song FROM media WHERE uuid = ?", 
+                params![id], |row| {
+                row.get::<usize, String>(0)
+                }).unwrap();
+                MediaType::Song(r)                
+            },
+        }
+    }
 }

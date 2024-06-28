@@ -17,6 +17,7 @@ pub fn data_path() -> Result<PathBuf> {
     }    
 }
 
+/// exact same as store_path, redundant
 pub fn journal_path() -> Result<PathBuf> {
     Ok(data_path()?.join("tg"))
 }
