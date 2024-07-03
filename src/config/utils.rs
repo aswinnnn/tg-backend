@@ -2,6 +2,8 @@ use std::{fs, path::PathBuf};
 use dirs;
 use anyhow::{Ok, Result};
 
+
+/// `thought-garden-app`
 pub fn data_path() -> Result<PathBuf> {
     if let Some(path) = dirs::data_dir() {
         let path = path.join("thought-garden-app");

@@ -25,6 +25,7 @@ pub struct Store {
     pub index: Vec<String>,
     pub db: StoreDatabase,
     pub dir: StoreFolder,
+    pub config: Configuration
 }
 
 impl Store {
@@ -34,6 +35,7 @@ impl Store {
             index: store_index()?,
             db: StoreDatabase::new(),
             dir: StoreFolder::new(),
+            config: Configuration {  }
         })
     }
 
