@@ -1,4 +1,4 @@
-use crate::db::{create_tables, getconn};
+use crate::{db::{create_tables, getconn}, journal::store::{self, store_path}};
 use anyhow::{Ok, Result};
 use dirs;
 use rusqlite::params;
@@ -38,24 +38,13 @@ impl Configuration {
     }
 
     pub fn exists() -> bool {
-        let r = match fs::read_dir(data_path().expect("checkconfig exists() failed")) {
-            core::result::Result::Ok(o) => o,
-            Err(_) => return false,
-        };
-
-        for e in r {
-            if e.expect("direntry failed")
-                .file_name()
-                .to_str()
-                .expect("invalid unicode filename wtf")
-                == "config.toml"
-            {
-                return true;
-            } else {
-                continue;
-            }
+        match store_path().unwrap().try_exists() {
+            core::result::Result::Ok(b) => {
+                println!("\x1b[34m[config check]\x1b[32m{b}\x1b[0m"); b
+            },
+            Err(e) => {eprintln!("\x1b[93m[Error]\x1b[0m {e}"); return false},
         }
-        false
+
     }
 
     pub fn edit(key: String, value: String) {

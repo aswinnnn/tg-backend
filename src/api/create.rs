@@ -14,6 +14,9 @@ pub fn create() -> Html<String> {
       <hr class="hbar">
       <p class="article-content" contenteditable="true" data-ph="Well, what's on your mind?" data-height="100vh"></p>
     </article>
+    <script>
+      debounceUpdateBuffer()
+    </script>
     "#
     ))
 }

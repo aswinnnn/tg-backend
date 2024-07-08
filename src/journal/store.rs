@@ -10,6 +10,7 @@ use crate::{
 use anyhow::{Error, Ok, Result};
 use axum::body::Bytes;
 use dirs;
+use rand::seq::SliceRandom;
 use rusqlite::params;
 use std::{
     fs::{self, File},
@@ -25,7 +26,7 @@ pub struct Store {
     pub index: Vec<String>,
     pub db: StoreDatabase,
     pub dir: StoreFolder,
-    pub config: Configuration
+    pub config: Configuration,
 }
 
 impl Store {
@@ -35,7 +36,7 @@ impl Store {
             index: store_index()?,
             db: StoreDatabase::new(),
             dir: StoreFolder::new(),
-            config: Configuration {  }
+            config: Configuration {},
         })
     }
 
@@ -110,7 +111,8 @@ pub fn store_path() -> Result<PathBuf> {
 
 fn store_index() -> Result<Vec<String>> {
     let mut ve: Vec<String> = Vec::new();
-    let r = store_path()?.read_dir().unwrap();
+    let r = store_path()?.read_dir()
+    .expect("LOOKS LIKE THE CONFIG DIRECTORY MIGHT BE GONE OR INACCESSIBLE.A");
 
     for entry in r {
         ve.push(
@@ -143,15 +145,30 @@ impl StoreDatabase {
             Err(e) => eprintln!("[SQLITError](store-add) {e}"),
         }
 
+        let default_wallpapers: Vec<&str> = vec![
+            "/assets/girl-garden-border-cover.svg",
+            "/assets/aliengardenframe.svg",
+            "/assets/AngelInGarden.svg",
+            "/assets/birdflower.svg",
+            "/assets/bluebutterfly1895.svg",
+            "/assets/decorativearchframe.svg",
+            "/assets/GardenAngelica.svg",
+            "/assets/gardening-tux.svg",
+            "/assets/garden-loafing.svg",
+            "/assets/macabre.svg",
+            "/assets/MaidenInGarden.svg",
+            "/assets/outlinedflower.svg",
+        ];
+        let mut rng = rand::thread_rng();
         // media should be shallow populated otherwise it just...errs
         match con.execute(
             "INSERT INTO media VALUES(?,?,?,?,?);",
             params![
                 id,
-                String::new(),
-                String::new(),
-                String::new(),
-                String::new()
+                String::from(default_wallpapers.choose(&mut rng).unwrap().to_owned()),
+                String::from("Lexend"),
+                String::from("🌿"),
+                String::from("")
             ],
         ) {
             core::result::Result::Ok(n) => println!("[SQLITE](media-add) {n} rows affected"),

@@ -11,7 +11,7 @@ pub fn getconn() -> Connection {
         // todo
         // SQLCipher pls
         // encrypting the journals
-        println!("[{t}][GETCONN] opened SQLite connection.");
+        println!("\x1b[93m{t}\x1b[0m [GETCONN] opened SQLite connection.");
         conn
     }
     else { 

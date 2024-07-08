@@ -1,6 +1,7 @@
 use std::{fs, io::Read};
 
 use axum::response::Html;
+use once_cell::sync::Lazy;
 use uuid::Uuid;
 
 use crate::{
@@ -12,23 +13,45 @@ use crate::{
 };
 
 pub fn home() -> Html<String> {
-    Html(journals())
+    Html(journals().to_string())
 }
 
-fn journals() -> String {
+static JOURNALS: Lazy<String> = Lazy::new(|| {
     if Configuration::exists() {
         let mut js = vec![String::new()];
 
-        for i in Store::new().unwrap().index {
-            let id = uuid::Uuid::parse_str(&i).unwrap();
-            js.push(generate_card(id));
+        if let Ok(store) = Store::new() {
+            for i in store.index {
+                if let Ok(id) = uuid::Uuid::parse_str(&i) {
+                    js.push(generate_card(id));
+                }
+            }
         }
 
         js.join(r#"<br style="opacity: 0;">"#)
     } else {
-        return String::from("no config yet");
+        "go ahead, write something down.".into()
     }
+});
+
+fn journals() -> &'static str {
+    &JOURNALS
 }
+
+// fn journals() -> String {
+//     if Configuration::exists() {
+//         let mut js = vec![String::new()];
+
+//         for i in Store::new().unwrap().index {
+//             let id = uuid::Uuid::parse_str(&i).unwrap();
+//             js.push(generate_card(id));
+//         }
+
+//         js.join(r#"<br style="opacity: 0;">"#)
+//     } else {
+//         "go ahead and write something down.".into()
+//     }
+// }
 
 fn generate_card(id: Uuid) -> String {
     let j = Store::get_journal(id.as_bytes().to_vec()).unwrap();
