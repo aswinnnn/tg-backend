@@ -28,7 +28,30 @@ static JOURNALS: Lazy<String> = Lazy::new(|| {
             }
         }
 
-        js.join(r#"<br style="opacity: 0;">"#)
+        let mut o = js.join(r#"<br style="opacity: 0;">"#);
+        o.push_str(
+            r#"<script>
+
+    function setupPostClickHandlers() {
+      const postElements = document.querySelectorAll('.post-bg');
+
+      postElements.forEach(post => {
+        console.log('you here?')
+        post.addEventListener('click', async function () {
+          const postId = this.getAttribute('data-id');
+
+          try {
+            // Assuming you've imported the invoke function from @tauri-apps/api
+            await window.__TAURI__.invoke('fill_post', { postId: postId });
+          } catch (error) {
+            console.error('Error calling Tauri function:', error);
+          }
+        });
+      });
+    }
+        setupPostClickHandlers();</script>"#,
+        );
+        o
     } else {
         "go ahead, write something down.".into()
     }
@@ -62,12 +85,12 @@ fn generate_card(id: Uuid) -> String {
         _ => String::new(),
     };
 
-    new_post(wp, j.buffer_title, content)
+    new_post(wp, j.buffer_title, content, &id.to_string())
 }
-fn new_post(wallpaper: String, title: String, content: String) -> String {
+fn new_post(wallpaper: String, title: String, content: String, id_str: &str) -> String {
     let template = format!(
         r#"
-    <div class="post-bg" data-src="{wallpaper}">
+    <div class="post-bg" data-src="{wallpaper}" data-id="{id_str}">
       <div class="post-content">
         <h4>{title} </h4><br>
         <p> {content}...</p>
