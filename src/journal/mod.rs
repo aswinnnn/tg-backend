@@ -7,11 +7,11 @@ use time::OffsetDateTime;
 pub mod store;
 use once_cell::sync::{Lazy, OnceCell};
 use uuid::Uuid;
-
+use serde::{Serialize,Deserialize};
 use crate::db::getconn;
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Journal {
     pub uuid: Vec<u8>,
     pub uuid_str: String,
@@ -27,11 +27,11 @@ pub struct Journal {
 /// all volatile "fields" are functions so we can get it realtime.
 /// do not depend on the struct fields for rt data lol they're just
 /// here to pass data unitarily.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Metadata {
     pub created_at: String,
     pub words: u64,
-    pub edited_at: String
+    pub edited_at: String,
 }
 
 pub enum MetadataField {
@@ -86,7 +86,7 @@ impl Metadata {
 }
 
 // some great analysis is on way.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 struct Analysis {}
 
 impl Analysis {

@@ -38,10 +38,9 @@ static JOURNALS: Lazy<String> = Lazy::new(|| {
       postElements.forEach(post => {
         console.log('you here?')
         post.addEventListener('click', async function () {
-          const postId = this.getAttribute('data-id');
+          const postId = post.getAttribute('data-id');
 
           try {
-            // Assuming you've imported the invoke function from @tauri-apps/api
             await window.__TAURI__.invoke('fill_post', { postId: postId });
           } catch (error) {
             console.error('Error calling Tauri function:', error);
