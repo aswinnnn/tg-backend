@@ -19,6 +19,7 @@ use std::{
 };
 use time::{OffsetDateTime, PrimitiveDateTime};
 use uuid::Uuid;
+use crate::config;
 
 /// gives you access to the journal database and directory
 pub struct Store {
@@ -36,7 +37,7 @@ impl Store {
             index: store_index()?,
             db: StoreDatabase::new(),
             dir: StoreFolder::new(),
-            config: Configuration {},
+            config: Configuration { },
         })
     }
 
@@ -54,8 +55,8 @@ impl Store {
                 .unwrap();
 
         // metadata struct
-        let mut created = String::new();
-        let mut edited = String::new();
+        let mut created = String::from(" ");
+        let mut edited = String::from(" ");
         let mut words = 0;
 
         let _ = con.query_row(
@@ -69,7 +70,7 @@ impl Store {
         );
 
         let _ = con.query_row(
-            "SELECT created_at,edited_at,words FROM metadata WHERE uuid = ?",
+            "SELECT created,edited,words FROM metadata WHERE uuid = ?",
             params![id],
             |row| {
                 created = row.get(0).expect("[sqlite] failed to get created_at");
@@ -84,6 +85,7 @@ impl Store {
             words: words,
             edited_at: edited,
         };
+
 
         let j = Journal {
             uuid: id,
@@ -134,7 +136,7 @@ impl StoreDatabase {
         StoreDatabase {}
     }
 
-    pub fn add(self, path: String, id: Vec<u8>, title: String, datetime: OffsetDateTime) {
+    pub fn add(self, path: String, id: Vec<u8>, title: String, datetime: String) {
         let con = getconn();
 
         match con.execute(

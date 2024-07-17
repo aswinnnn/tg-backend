@@ -1,15 +1,13 @@
 use crate::{db::{create_tables, getconn}, journal::store::{self, store_path}};
 use anyhow::{Ok, Result};
 use dirs;
+use json::Config;
 use rusqlite::params;
 use std::{collections::HashMap, fs};
-use toml_edit::{DocumentMut, TomlError};
 use utils::data_path;
 pub mod utils;
+pub mod json;
 
-/// every `Config` has a string key.
-/// this key maps to a `Config` value that can
-/// create, edit that said config.
 pub struct Configuration {
 }
 
@@ -20,14 +18,14 @@ impl Configuration {
     pub fn create() -> Result<()> {
         match utils::create_config_dir() {
             Err(e) => {
-                eprintln!("[create-config] {e}")
+                eprintln!("\x1b[31m[create-config]\x1b[0m {e}")
             }
             _ => {}
         };
 
         match utils::populate_config_dir() {
             Err(e) => {
-                eprintln!("[populate-config] {e}")
+                eprintln!("\x1b[31m[populate-config]\x1b[0m {e}")
             }
             _ => {}
         };
@@ -47,13 +45,21 @@ impl Configuration {
 
     }
 
-    pub fn edit(key: String, value: String) {
+    /// alright, so our settings is stored in a JSON file
+    /// in a key-value pair. No we cant use toml because
+    /// i want native perfomance when the browser reads the
+    /// settings exposed via API (which are modified through this function).
+    /// There is also a config table in db updated simultaneously 
+    /// for faster access to the backend.
+    pub fn edit(config: &mut Config, key: String, value: String) {
         match getconn().execute("
         REPLACE INTO config (key,value)
         VALUES(?,?) 
         ", params![key,value]) {
-            core::result::Result::Ok(o) => println!("[CONFIG-EDIT] Affected {o} rows."),
-            Err(e) => eprintln!("[CONFIG-EDIT] {e}"),
+            core::result::Result::Ok(o) => println!("\x1b[32m[CONFIG-EDIT-db]\x1b[0m Affected {o} rows."),
+            Err(e) => eprintln!("\x1b[31m[CONFIG-EDIT-db]\x1b[0m {e}"),
         };
+
+        json::modify_config(&key, &value, config)
     }
 }

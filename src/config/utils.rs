@@ -1,4 +1,4 @@
-use std::{fs, path::PathBuf};
+use std::{fs, io::Write, path::PathBuf};
 use dirs;
 use anyhow::{Ok, Result};
 
@@ -24,6 +24,7 @@ pub fn journal_path() -> Result<PathBuf> {
     Ok(data_path()?.join("tg"))
 }
 
+/// `.db/tgdb`
 pub fn db_path() -> Result<PathBuf> {
     Ok(data_path()?.join(".db").join("tgdb"))
 }
@@ -35,8 +36,15 @@ pub fn create_config_dir() -> Result<PathBuf> {
 }
 
 pub fn populate_config_dir() -> Result<()> {
-    fs::File::create(data_path()?.join("config.toml"))?; 
-    fs::File::create(data_path()?.join("appearance.toml"))?;
+    match fs::File::create(data_path()?.join("config.json")) {
+        Result::Ok(mut f) => {f.write_all(br#"
+        {
+            "home.emoji": "home",
+            "create.emoji": "sunflower"
+        }
+        "#)?},
+        Err(e) => {eprintln!("[populat-config-json] {e}")},
+    }
     fs::create_dir(data_path()?.join("tg"))?;
     fs::create_dir(data_path()?.join(".db"))?;
     fs::File::create(db_path()?)?;
