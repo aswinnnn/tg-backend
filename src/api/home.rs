@@ -1,6 +1,6 @@
 use std::{fs, io::Read};
 
-use axum::response::Html;
+use axum::response::{Html, IntoResponse};
 use once_cell::sync::Lazy;
 use uuid::Uuid;
 
@@ -12,18 +12,19 @@ use crate::{
     },
 };
 
-pub fn home() -> Html<String> {
-    Html(journals().to_string())
+pub async fn home() -> impl IntoResponse {
+    Html(journals().await.to_string())
 }
 
-static JOURNALS: Lazy<String> = Lazy::new(|| {
+
+async fn journals() -> String {
     if Configuration::exists() {
         let mut js = vec![String::new()];
 
         if let Ok(store) = Store::new() {
             for i in store.index {
                 if let Ok(id) = uuid::Uuid::parse_str(&i) {
-                    js.push(generate_card(id));
+                    js.push(generate_card(id).await);
                 }
             }
         }
@@ -54,10 +55,6 @@ static JOURNALS: Lazy<String> = Lazy::new(|| {
     } else {
         "go ahead, write something down.".into()
     }
-});
-
-fn journals() -> &'static str {
-    &JOURNALS
 }
 
 // fn journals() -> String {
@@ -75,7 +72,7 @@ fn journals() -> &'static str {
 //     }
 // }
 
-fn generate_card(id: Uuid) -> String {
+async fn generate_card(id: Uuid) -> String {
     let j = Store::get_journal(id.as_bytes().to_vec()).unwrap();
 
     let content: String = j.buffer.chars().take(64).collect();
@@ -84,9 +81,9 @@ fn generate_card(id: Uuid) -> String {
         _ => String::new(),
     };
 
-    new_post(wp, j.buffer_title, content, &id.to_string())
+    new_post(wp, j.buffer_title, content, &id.to_string()).await
 }
-fn new_post(wallpaper: String, title: String, content: String, id_str: &str) -> String {
+async fn new_post(wallpaper: String, title: String, content: String, id_str: &str) -> String {
     let template = format!(
         r#"
     <div class="post-bg" data-src="{wallpaper}" data-id="{id_str}">

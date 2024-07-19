@@ -1,7 +1,7 @@
-use axum::response::Html;
+use axum::response::{Html, IntoResponse};
 use chrono::{DateTime, Local};
 
-pub fn create() -> Html<String> {
+pub async fn create() -> impl IntoResponse {
     let local = Local::now().format("%A, %d %B, %Y").to_string();
     let time = Local::now().format(" %-I:%M %p").to_string();
 
@@ -21,7 +21,7 @@ pub fn create() -> Html<String> {
     ))
 }
 
-pub fn sidenav() -> Html<String> {
+pub async fn sidenav() -> impl IntoResponse {
     Html(
         r#"
   <div class="option" >

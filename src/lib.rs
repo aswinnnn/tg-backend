@@ -23,9 +23,9 @@ pub async fn start() {
     // build our application with a single route
     let app = Router::new()
         .route("/", get(|| async { "there is nothing here." }))
-        .route("/api/create", get(api::create::create()))
-        .route("/api/home", get(api::home::home()))
-        .route("/api/create/sidenav", get(api::create::sidenav()))
+        .route("/api/create", get(api::create::create))
+        .route("/api/home", get(api::home::home))
+        .route("/api/create/sidenav", get(api::create::sidenav))
         .nest_service(
             "/src",
             ServeDir::new("/home/aswin/projects/thought-garden/src"),
