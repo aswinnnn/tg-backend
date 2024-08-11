@@ -16,7 +16,6 @@ pub async fn home() -> impl IntoResponse {
     Html(journals().await.to_string())
 }
 
-
 async fn journals() -> String {
     if Configuration::exists() {
         let mut js = vec![String::new()];
@@ -87,6 +86,7 @@ async fn new_post(wallpaper: String, title: String, content: String, id_str: &st
     let template = format!(
         r#"
     <div class="post-bg" data-src="{wallpaper}" data-id="{id_str}">
+    <div class="post-menu"><img src="/buttons/menu.svg"></img></div>
       <div class="post-content">
         <h4>{title} </h4><br>
         <p> {content}...</p>

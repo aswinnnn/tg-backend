@@ -14,6 +14,7 @@ pub async fn start() {
     let origins = [
         "tauri://localhost".parse::<HeaderValue>().unwrap(),
         "http://localhost:1420".parse::<HeaderValue>().unwrap(),
+        "https://tauri.localhost".parse::<HeaderValue>().unwrap(),
     ];
     let cors = CorsLayer::new()
         .allow_origin(origins)
