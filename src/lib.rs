@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use axum::http::HeaderValue;
 use axum::{routing::get, Router};
 use tower_http::cors::{Any, CorsLayer};
@@ -9,8 +11,9 @@ pub mod db;
 pub mod journal;
 mod routes;
 
-pub async fn start() {
+pub async fn start(resource: PathBuf) {
     // cors so tauri can fetch without trouble
+    println!("[TG-BACKEND] found resource directory: {:#?}", resource);
     let origins = [
         "tauri://localhost".parse::<HeaderValue>().unwrap(),
         "http://localhost:1420".parse::<HeaderValue>().unwrap(),
@@ -27,30 +30,12 @@ pub async fn start() {
         .route("/api/create", get(api::create::create))
         .route("/api/home", get(api::home::home))
         .route("/api/create/sidenav", get(api::create::sidenav))
-        .nest_service(
-            "/src",
-            ServeDir::new("/home/aswin/projects/thought-garden/src"),
-        )
-        .nest_service(
-            "/assets",
-            ServeDir::new("/home/aswin/projects/thought-garden/src/assets"),
-        )
-        .nest_service(
-            "/intro",
-            ServeDir::new("/home/aswin/projects/thought-garden/src/intro"),
-        )
-        .nest_service(
-            "/create",
-            ServeDir::new("/home/aswin/projects/thought-garden/src/create"),
-        )
-        .nest_service(
-            "/buttons",
-            ServeDir::new("/home/aswin/projects/thought-garden/src/buttons"),
-        )
-        .nest_service(
-            "/settings",
-            ServeDir::new("/home/aswin/projects/thought-garden/src/settings"),
-        )
+        .nest_service("/src", ServeDir::new(&resource))
+        .nest_service("/assets", ServeDir::new(&resource.join("assets")))
+        .nest_service("/intro", ServeDir::new(&resource.join("intro")))
+        .nest_service("/create", ServeDir::new(&resource.join("create")))
+        .nest_service("/buttons", ServeDir::new(&resource.join("buttons")))
+        .nest_service("/settings", ServeDir::new(&resource.join("settings")))
         .layer(cors);
 
     // run our app with hyper, listening globally on port 3000
