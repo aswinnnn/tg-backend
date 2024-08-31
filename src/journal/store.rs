@@ -1,3 +1,4 @@
+use crate::config;
 use crate::{
     analysis,
     config::{
@@ -11,6 +12,7 @@ use anyhow::{Error, Ok, Result};
 use axum::body::Bytes;
 use dirs;
 use rand::seq::SliceRandom;
+use rand::Rng;
 use rusqlite::params;
 use std::{
     fs::{self, File},
@@ -19,7 +21,6 @@ use std::{
 };
 use time::{OffsetDateTime, PrimitiveDateTime};
 use uuid::Uuid;
-use crate::config;
 
 /// gives you access to the journal database and directory
 pub struct Store {
@@ -37,7 +38,7 @@ impl Store {
             index: store_index()?,
             db: StoreDatabase::new(),
             dir: StoreFolder::new(),
-            config: Configuration { },
+            config: Configuration {},
         })
     }
 
@@ -86,7 +87,6 @@ impl Store {
             edited_at: edited,
         };
 
-
         let j = Journal {
             uuid: id,
             uuid_str: id_str.clone(),
@@ -113,8 +113,9 @@ pub fn store_path() -> Result<PathBuf> {
 
 fn store_index() -> Result<Vec<String>> {
     let mut ve: Vec<String> = Vec::new();
-    let r = store_path()?.read_dir()
-    .expect("LOOKS LIKE THE CONFIG DIRECTORY MIGHT BE GONE OR INACCESSIBLE.A");
+    let r = store_path()?
+        .read_dir()
+        .expect("LOOKS LIKE THE CONFIG DIRECTORY MIGHT BE GONE OR INACCESSIBLE.A");
 
     for entry in r {
         ve.push(
@@ -147,27 +148,13 @@ impl StoreDatabase {
             Err(e) => eprintln!("[SQLITError](store-add) {e}"),
         }
 
-        let default_wallpapers: Vec<&str> = vec![
-            "/assets/girl-garden-border-cover.svg",
-            "/assets/aliengardenframe.svg",
-            "/assets/AngelInGarden.svg",
-            "/assets/birdflower.svg",
-            "/assets/bluebutterfly1895.svg",
-            "/assets/decorativearchframe.svg",
-            "/assets/GardenAngelica.svg",
-            "/assets/gardening-tux.svg",
-            "/assets/garden-loafing.svg",
-            "/assets/macabre.svg",
-            "/assets/MaidenInGarden.svg",
-            "/assets/outlinedflower.svg",
-        ];
-        let mut rng = rand::thread_rng();
+        let random_wallpaper = format!("assets/{}.avif", rand::thread_rng().gen_range(1..=15)); 
         // media should be shallow populated otherwise it just...errs
         match con.execute(
             "INSERT INTO media VALUES(?,?,?,?,?);",
             params![
                 id,
-                String::from(default_wallpapers.choose(&mut rng).unwrap().to_owned()),
+                random_wallpaper,
                 String::from("Lexend"),
                 String::from("🌿"),
                 String::from("")

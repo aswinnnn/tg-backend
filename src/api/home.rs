@@ -29,28 +29,39 @@ async fn journals() -> String {
         }
 
         let mut o = js.join(r#"<br style="opacity: 0;">"#);
-        o.push_str(
-            r#"<script>
-
-    function setupPostClickHandlers() {
-      const postElements = document.querySelectorAll('.post-bg');
-
-      postElements.forEach(post => {
-        console.log('you here?')
-        post.addEventListener('click', async function () {
-          const postId = post.getAttribute('data-id');
-
-          try {
-            await window.__TAURI__.invoke('fill_post', { postId: postId });
-          } catch (error) {
-            console.error('Error calling Tauri function:', error);
-          }
-        });
-      });
+        o.push_str(r#"
+        <script>
+async function fill_post(postId) {
+    try {
+        await window.__TAURI__.invoke('fill_post', { postId: postId });
+    } catch (error) {
+        console.error('Error invoking Tauri fill_post[home.rs:38]:', error);
     }
-        setupPostClickHandlers();</script>"#,
-        );
+} </script>
+        "#);
         o
+    //     o.push_str(
+    //         r#"<script>
+
+    // function setupPostClickHandlers() {
+    //   const postElements = document.querySelectorAll('.post-bg');
+
+    //   postElements.forEach(post => {
+    //     console.log('click handler set.')
+    //     post.addEventListener('click', async function () {
+    //       const postId = post.getAttribute('data-id');
+
+    //       try {
+    //         await window.__TAURI__.invoke('fill_post', { postId: postId });
+    //       } catch (error) {
+    //         console.error('Error invoking Tauri fill_post[home.rs:46]:', error);
+    //       }
+    //     });
+    //   });
+    // }
+    //     setupPostClickHandlers();</script>"#,
+    //     );
+    //     o
     } else {
         "go ahead, write something down.".into()
     }
@@ -85,13 +96,22 @@ async fn generate_card(id: Uuid) -> String {
 async fn new_post(wallpaper: String, title: String, content: String, id_str: &str) -> String {
     let template = format!(
         r#"
-    <div class="post-bg" data-src="{wallpaper}" data-id="{id_str}">
-    <div class="post-menu"><img src="/buttons/menu.svg"></img></div>
-      <div class="post-content">
-        <h4>{title} </h4><br>
-        <p> {content}...</p>
-      </div>
-    </div>"#
+<div class="post-bg" data-src="{wallpaper}" data-id="{id_str}" onclick="event.stopPropagation();fill_post('{id_str}')">
+<div class="post-menu-outer">
+  <img src="/buttons/more_vert.svg" onclick="event.stopPropagation();display('.post-menu-{id_str}')"></img>
+  <br> 
+  <div class="post-menu-{id_str}"  data-seen="false" style="display: none">
+    <img src="/buttons/delete.svg" onclick="event.stopPropagation();post_delete('{id_str}')"></img>
+    <br>
+    <img src="/buttons/settings.svg" onclick="event.stopPropagation();post_settings('{id_str}')"></img>
+  </div>
+</div>
+  <div class="post-content">
+    <h4>{title} </h4><br>
+    <p> {content}...</p>
+  </div>
+</div>
+"#
     );
 
     template
