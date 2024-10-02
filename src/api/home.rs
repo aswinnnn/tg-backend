@@ -29,7 +29,8 @@ async fn journals() -> String {
         }
 
         let mut o = js.join(r#"<br style="opacity: 0;">"#);
-        o.push_str(r#"
+        o.push_str(
+            r#"
         <script>
 async function fill_post(postId) {
     try {
@@ -38,7 +39,8 @@ async function fill_post(postId) {
         console.error('Error invoking Tauri fill_post[home.rs:38]:', error);
     }
 } </script>
-        "#);
+        "#,
+        );
         o
     //     o.push_str(
     //         r#"<script>

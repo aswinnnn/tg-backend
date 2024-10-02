@@ -138,7 +138,6 @@ impl Journal {
             edited_at: created.to_string(),
         };
 
-
         st.dir.create(id_str.as_str())?;
         // store should always be the first to receive stuff
         st.db.add(

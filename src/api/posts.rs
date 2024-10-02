@@ -1,4 +1,3 @@
-
 use axum::response::{Html, IntoResponse};
 
 pub async fn options() -> impl IntoResponse {

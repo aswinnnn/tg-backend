@@ -30,6 +30,7 @@ pub async fn sidenav() -> impl IntoResponse {
   <div class="option" onclick="window.__TAURI__.tauri.invoke('redirect', {to: 'settings'})">
     <img src="/buttons/add.svg"></img> &nbspsettings
   </div>
-  "#.to_string()
+  "#
+        .to_string(),
     )
 }
