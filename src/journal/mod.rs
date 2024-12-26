@@ -25,7 +25,7 @@ pub struct Journal {
 
 /// this is sqlite territory. we have some precious metadata
 /// journal titles are in the store db for faster gets.
-/// all volatile "fields" are functions so we can get it realtime.
+/// all volatile "fields" are functions so we can get it realtime (last_edited, words, etc).
 /// do not depend on the struct fields for rt data lol they're just
 /// here to pass data unitarily.
 #[derive(Debug, Serialize, Deserialize, Clone)]
