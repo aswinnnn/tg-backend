@@ -8,6 +8,8 @@ use super::utils::data_path;
 pub type Config = HashMap<String, Value>;
 
 pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
+    //! Returns a Config file, freshly read.
+    
     let file = File::open(data_path()?.join("config.json"))?;
     let reader = BufReader::new(file);
     let config: Config = from_reader(reader)?;

@@ -21,15 +21,17 @@ impl Configuration {
         match utils::create_config_dir() {
             Err(e) => {
                 eprintln!("\x1b[31m[create-config]\x1b[0m {e}")
-            }
-            _ => {}
+            },
+        Result::Ok(o) => {println!("\x1b[32m[create-config] success:\x1b[0m {:#?}", o)}
         };
 
         match utils::populate_config_dir() {
             Err(e) => {
                 eprintln!("\x1b[31m[populate-config]\x1b[0m {e}")
             }
-            _ => {}
+            Result::Ok(_) => {
+                println!("\x1b[32m[populate-config] success\x1b[0m")
+            }
         };
 
         create_tables();
@@ -51,11 +53,10 @@ impl Configuration {
     }
 
     /// alright, so our settings is stored in a JSON file
-    /// in a key-value pair. No we cant use toml because
-    /// i want native perfomance when the browser reads the
-    /// settings exposed via API (which are modified through this function).
-    /// There is also a config table in db updated simultaneously
-    /// for faster access to the backend.
+    /// in a key-value pair.
+    /// 1. Get a Config from read_config()
+    /// 2. Put  it through here as one of the arguments to edit it.
+    /// 3. This function will take care of writing to the file.
     pub fn edit(config: &mut Config, key: String, value: String) {
         match getconn().execute(
             "
@@ -70,6 +71,12 @@ impl Configuration {
             Err(e) => eprintln!("\x1b[31m[CONFIG-EDIT-db]\x1b[0m {e}"),
         };
 
-        json::modify_config(&key, &value, config)
+        json::modify_config(&key, &value, config);
+        if let Err(e) = json::write_config(config) {
+            eprintln!("\x1b[31m[Configuration::edit][WRITE-CONFIG]\x1b[0m {e}")
+        }
+        else {
+            println!("[Configuration::edit][WRITE-CONFIG] success")
+        }
     }
 }
