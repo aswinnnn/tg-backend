@@ -1,5 +1,16 @@
+use std::process::exit;
+
 use crate::config;
-use axum::response::{Html, IntoResponse};
+use axum::{response::{Html, IntoResponse}, Json};
+
+pub async fn read() -> impl IntoResponse {
+    match config::json::read_config() {
+        Ok(conf) => {
+            Json(conf)
+        },
+        Err(e) => {eprintln!("[SETTINGS-READ] {e}"); exit(1)},
+    }
+}
 
 pub async fn general() -> impl IntoResponse {
     let res: String = String::new();

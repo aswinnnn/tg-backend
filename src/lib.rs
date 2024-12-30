@@ -30,6 +30,7 @@ pub async fn start(resource: PathBuf) {
         .route("/api/home", get(api::home::home))
         .route("/api/create", get(api::create::create))
         .route("/api/create/sidenav", get(api::create::sidenav))
+        .route("/api/settings", get(api::settings::read))
         .route("/api/settings/general", get(api::settings::general))
         .route("/api/settings/appearance", get(api::settings::appearance))
         .route("/api/posts/options", get(api::posts::options))
