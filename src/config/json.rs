@@ -20,7 +20,10 @@ pub fn modify_config(key: &str, value: &str, config: &mut Config) {
     // Add a new key-value pair or update existing one
     match config.insert(key.to_string(), Value::String(value.to_string())) {
         Some(old) => {
-            println!("\x1b[97m[MODIFY-CONFIG]\x1b[0m updated key '{key}' from '{old}' to '{value}'")
+            match write_config(config) {
+                Ok(_) => println!("\x1b[97m[MODIFY-CONFIG]\x1b[0m updated key '{key}' from '{old}' to '{value}'"),
+                Err(e) => eprintln!("\x1b[31m[MODIFY-CONFIG] {e}\x1b[0m"),
+            }
         }
         None => {
             println!("\x1b[96m[MODIFY-CONFIG]\x1b[0m new key: {key} value: {value}");
@@ -29,7 +32,7 @@ pub fn modify_config(key: &str, value: &str, config: &mut Config) {
 }
 
 pub fn write_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
-    let file = File::create("config.json")?;
+    let file = File::create(data_path()?.join("config.json"))?;
     let writer = BufWriter::new(file);
     to_writer(writer, config)?;
     Ok(())
