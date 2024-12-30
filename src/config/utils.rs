@@ -43,8 +43,10 @@ pub fn populate_config_dir() -> Result<()> {
             "home.emoji": "&#x1f3e1",
             "create.emoji": "&#x1f33b",
             "theme.light.background-color":"#ffcfa8",
+            "theme.light.secondary-color":"#ffe4c4",
             "theme.light.text-color": "#00000",
             "theme.dark.background-color": "#3d3128",
+            "theme.dark.secondary-color":"#696470",
             "theme.dark.text-color": "#ffffff"
         }
         "####,

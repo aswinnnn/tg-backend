@@ -39,37 +39,47 @@ pub async fn appearance() -> impl IntoResponse {
         <h2>Theme</h2>
         <h3>- Light mode</h3>
         <div class="option">
-                 <label for="theme.light.background-color">background color</label>
-                 <textarea id="theme.light.background-color" name="theme.light.background-color" maxlength="10">{}</textarea>
+                 <label for="theme.light.background-color">primary color</label>
+                 <input type="color" id="theme.light.background-color" name="theme.light.background-color" data-type="set-option" value="{}"></input>
+        </div>
+        <div class="option">
+                 <label for="theme.light.secondary-color">secondary color</label>
+                 <input type="color" id="theme.light.secondary-color" name="theme.light.secondary-color" data-type="set-option" value="{}"></input>
         </div>
         <div class="option">
                  <label for="theme.light.text-color">text color</label>
-                 <textarea id="theme.light.text-color" name="theme.light.text-color" maxlength="10">{}</textarea>
+                 <input type="color" id="theme.light.text-color" name="theme.light.text-color" data-type="set-option" value="{}"></input>
         </div>
         <h3>- Dark mode</h3>
         <div class="option">
                  <label for="theme.dark.background-color">background color</label>
-                 <textarea id="theme.dark.background-color" name="theme.light.background-color" maxlength="10">{}</textarea>
+                 <input type="color" id="theme.dark.background-color" name="theme.light.background-color" data-type="set-option" value="{}"></input>
+        </div>
+        <div class="option">
+                 <label for="theme.dark.secondary-color">secondary color</label>
+                 <input type="color" id="theme.dark.secondary-color" name="theme.dark.secondary-color" data-type="set-option" value="{}"></input>
         </div>
         <div class="option">
                  <label for="theme.dark.text-color">text color</label>
-                 <textarea id="theme.dark.text-color" name="theme.dark.text-color" maxlength="10">{}</textarea>
+                 <input type="color" id="theme.dark.text-color" name="theme.dark.text-color" data-type="set-option" maxlength="10" value="{}"></input>
         </div>
         <hr>
         <h2>Emoji</h2>
         <div class="option">
                  <label for="">home button</label>
-                 <textarea id="home.emoji" name="home.emoji" maxlength="10">{}</textarea>
+                 <textarea id="home.emoji" name="home.emoji" data-type="set-option" maxlength="10">{}</textarea>
         </div>
         <div class="option">
                  <label for="">create button</label>
-                 <textarea id="create.emoji" name="create.emoji" maxlength="10">{}</textarea>
+                 <textarea id="create.emoji" name="create.emoji" data-type="set-option" maxlength="10">{}</textarea>
         </div>
         <script>loadlisteners()</script>
     "#,
             conf.get("theme.light.background-color").unwrap().as_str().unwrap().to_string(),
+            conf.get("theme.light.secondary-color").unwrap().as_str().unwrap().to_string(),
             conf.get("theme.light.text-color").unwrap().as_str().unwrap().to_string(),
             conf.get("theme.dark.background-color").unwrap().as_str().unwrap().to_string(),
+            conf.get("theme.dark.secondary-color").unwrap().as_str().unwrap().to_string(),
             conf.get("theme.dark.text-color").unwrap().as_str().unwrap().to_string(),
             conf.get("home.emoji").unwrap().as_str().unwrap().to_string(),
             conf.get("create.emoji").unwrap().as_str().unwrap().to_string() 
