@@ -36,6 +36,7 @@ pub async fn start(resource: PathBuf) {
         .route("/api/posts/options", get(api::posts::options))
         .nest_service("/src", ServeDir::new(&resource))
         .nest_service("/assets", ServeDir::new(&resource.join("assets")))
+        .nest_service("/about", ServeDir::new(&resource.join("about")))
         .nest_service("/intro", ServeDir::new(&resource.join("intro")))
         .nest_service("/create", ServeDir::new(&resource.join("create")))
         .nest_service("/buttons", ServeDir::new(&resource.join("buttons")))

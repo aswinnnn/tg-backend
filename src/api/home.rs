@@ -103,9 +103,9 @@ async fn new_post(wallpaper: String, title: String, content: String, id_str: &st
   <img src="/buttons/more_vert.svg" onclick="event.stopPropagation();display('.post-menu-{id_str}')"></img>
   <br> 
   <div class="post-menu-{id_str}"  data-seen="false" style="display: none">
-    <img src="/buttons/delete.svg" onclick="event.stopPropagation();post_delete('{id_str}')"></img>
-    <br>
     <img src="/buttons/settings.svg" onclick="event.stopPropagation();post_settings('{id_str}')"></img>
+    <br>
+    <img src="/buttons/delete.svg" onclick="event.stopPropagation();post_delete('{id_str}')"></img>
   </div>
 </div>
   <div class="post-content">
