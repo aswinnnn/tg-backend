@@ -38,7 +38,8 @@ async function fill_post(postId) {
     } catch (error) {
         console.error('Error invoking Tauri fill_post[home.rs:38]:', error);
     }
-} </script>
+}
+    loadsettings()</script>
         "#,
         );
         o

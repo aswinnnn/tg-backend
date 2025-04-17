@@ -148,7 +148,7 @@ impl StoreDatabase {
             Err(e) => eprintln!("[SQLITError](store-add) {e}"),
         }
 
-        let random_wallpaper = format!("assets/{}.avif", rand::thread_rng().gen_range(1..=15));
+        let random_wallpaper = format!("assets/{}.avif", rand::thread_rng().gen_range(1..=23));
         // media should be shallow populated otherwise it just...errs
         match con.execute(
             "INSERT INTO media VALUES(?,?,?,?,?);",
